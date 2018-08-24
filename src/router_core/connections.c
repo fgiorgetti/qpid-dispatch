@@ -1893,16 +1893,20 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
 
     link->owning_addr = 0;
 
+    qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - detach_count = %d", link->detach_count);
     if (link->detach_count == 1) {
         //
         // Handle the disposition of any deliveries that remain on the link
         //
+        qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - before qdr_link_cleanup_deliveries_CT");
         qdr_link_cleanup_deliveries_CT(core, conn, link);
         
         //
         // If the detach occurred via protocol, send a detach back.
         //
+        qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", dt, QD_LOST);
         if (dt != QD_LOST)
+            qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - dt is != QD_LOST");
             qdr_link_outbound_detach_CT(core, link, 0, QDR_CONDITION_NONE, dt == QD_CLOSED);
     } else {
         qdr_link_cleanup_CT(core, conn, link);
