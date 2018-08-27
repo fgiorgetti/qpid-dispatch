@@ -767,11 +767,13 @@ static int AMQP_link_flow_handler(void* context, qd_link_t *link)
  */
 static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_type_t dt)
 {
+    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "ENTMQIC-2033 - AMQP_link_detach_handler - entered");
     if (!link)
         return 0;
 
     pn_link_t      *pn_link      = qd_link_pn(link);
 
+    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "ENTMQIC-2033 - AMQP_link_detach_handler - before !pn_link");
     if (!pn_link)
         return 0;
 
@@ -791,6 +793,7 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
     pn_condition_t *cond   = qd_link_pn(link) ? pn_link_remote_condition(qd_link_pn(link)) : 0;
 
     if (rlink) {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "ENTMQIC-2033 - AMQP_link_detach_handler - if (rlink)");
         //
         // This is the last event for this link that we will send into the core.  Remove the
         // core linkage.  Note that the core->qd linkage is still in place.

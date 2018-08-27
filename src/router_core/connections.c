@@ -494,6 +494,7 @@ void qdr_link_detach(qdr_link_t *link, qd_detach_type_t dt, qdr_error_t *error)
     action->args.connection.error  = error;
     action->args.connection.dt     = dt;
     qdr_action_enqueue(link->core, action);
+    qd_log(link->core->log, QD_LOG_INFO, "ENTMQIC-2033 - link_detach enqueued");
 }
 
 
