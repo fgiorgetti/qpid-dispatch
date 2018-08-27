@@ -767,15 +767,17 @@ static int AMQP_link_flow_handler(void* context, qd_link_t *link)
  */
 static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_type_t dt)
 {
-    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "ENTMQIC-2033 - AMQP_link_detach_handler - entered");
-    if (!link)
+    if (!link) {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - !link", qd_link_connection(link));
         return 0;
+    }
 
     pn_link_t      *pn_link      = qd_link_pn(link);
 
-    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "ENTMQIC-2033 - AMQP_link_detach_handler - before !pn_link");
-    if (!pn_link)
+    if (!pn_link) {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%\"PRIu64\"] ENTMQIC-2033 - AMQP_link_detach_handler - !pn_link", qd_link_connection(link));
         return 0;
+    }
 
     pn_delivery_t  *pnd          = pn_link_current(pn_link);
 
@@ -793,7 +795,8 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
     pn_condition_t *cond   = qd_link_pn(link) ? pn_link_remote_condition(qd_link_pn(link)) : 0;
 
     if (rlink) {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "ENTMQIC-2033 - AMQP_link_detach_handler - if (rlink)");
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%\"PRIu64\"] ENTMQIC-2033 - AMQP_link_detach_handler - rlink", qd_link_connection(link));
+
         //
         // This is the last event for this link that we will send into the core.  Remove the
         // core linkage.  Note that the core->qd linkage is still in place.
@@ -813,6 +816,8 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
 
         qdr_error_t *error = qdr_error_from_pn(cond);
         qdr_link_detach(rlink, dt, error);
+    } else {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%\"PRIu64\"] ENTMQIC-2033 - AMQP_link_detach_handler - !rlink", qd_link_connection(link));
     }
 
     return 0;

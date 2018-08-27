@@ -22,6 +22,7 @@
 #include <qpid/dispatch/amqp.h>
 #include <stdio.h>
 #include <strings.h>
+#include <inttypes.h>
 #include "router_core_private.h"
 
 static void qdr_connection_opened_CT(qdr_core_t *core, qdr_action_t *action, bool discard);
@@ -494,7 +495,9 @@ void qdr_link_detach(qdr_link_t *link, qd_detach_type_t dt, qdr_error_t *error)
     action->args.connection.error  = error;
     action->args.connection.dt     = dt;
     qdr_action_enqueue(link->core, action);
-    qd_log(link->core->log, QD_LOG_INFO, "ENTMQIC-2033 - link_detach enqueued");
+
+    qd_link_t *qlink = (qd_link_t*) qdr_link_get_context(link);
+    qd_log(link->core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - link_detach enqueued", qd_link_connection(qlink));
 }
 
 
@@ -1797,6 +1800,12 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
 
     qdr_connection_t *conn      = action->args.connection.conn;
     qdr_link_t       *link      = action->args.connection.link;
+
+
+    // FERNANDO
+    qd_link_t *qlink = (qd_link_t*) qdr_link_get_context(link);
+
+
     qdr_error_t      *error     = action->args.connection.error;
     qd_detach_type_t  dt        = action->args.connection.dt;
     qdr_address_t    *addr      = link->owning_addr;
@@ -1806,13 +1815,13 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
     // Bump the detach count to track half and full detaches
     //
     link->detach_count++;
-    qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - entered qdr_link_inbound_detach_CT");
+    qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - entered qdr_link_inbound_detach_CT", qd_link_connection(qlink));
 
     //
     // For routed links, propagate the detach
     //
     if (link->connected_link) {
-        qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - connected_link");
+        qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - connected_link", qd_link_connection(qlink));
         //
         // If the connected link is outgoing and there is a delivery on the connected link's undelivered
         // list that is not receive-complete, we must flag that delivery as aborted or it will forever
@@ -1897,23 +1906,23 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
     }
 
     link->owning_addr = 0;
-
-    qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - detach_count = %d", link->detach_count);
+    qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - detach_count = %d", link->detach_count, qd_link_connection(qlink));
     if (link->detach_count == 1) {
         //
         // Handle the disposition of any deliveries that remain on the link
         //
-        qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - before qdr_link_cleanup_deliveries_CT");
+        qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - before qdr_link_cleanup_deliveries_CT", qd_link_connection(qlink));
         qdr_link_cleanup_deliveries_CT(core, conn, link);
         
         //
         // If the detach occurred via protocol, send a detach back.
         //
-        qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", dt, QD_LOST);
+        qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", dt, QD_LOST, qd_link_connection(qlink));
         if (dt != QD_LOST)
-            qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - dt is != QD_LOST");
+            qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - dt is != QD_LOST", qd_link_connection(qlink));
             qdr_link_outbound_detach_CT(core, link, 0, QDR_CONDITION_NONE, dt == QD_CLOSED);
     } else {
+        qd_log(core->log, QD_LOG_INFO, "[%"PRIu64"] ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", dt, QD_LOST, qd_link_connection(qlink));
         qdr_link_cleanup_CT(core, conn, link);
         free_qdr_link_t(link);
     }
