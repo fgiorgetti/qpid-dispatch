@@ -1369,10 +1369,13 @@ static void CORE_link_detach(void *context, qdr_link_t *link, qdr_error_t *error
             pn_terminus_set_type(pn_link_source(pn_link), PN_UNSPECIFIED);
     }
 
-    if (close)
+    if (close) {
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "ENTMQIC-2033 - if close");
         qd_link_close(qlink);
-    else
+    } else {
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "ENTMQIC-2033 - if !close");
         qd_link_detach(qlink);
+    }
 
     //
     // This is the last event for this link that we are going to send into Proton.
