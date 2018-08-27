@@ -1790,8 +1790,10 @@ static void qdr_link_inbound_second_attach_CT(qdr_core_t *core, qdr_action_t *ac
 
 static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, bool discard)
 {
-    if (discard)
+    if (discard) {
+        qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - qdr_link_inbound_detach_CT DISCARD");
         return;
+    }
 
     qdr_connection_t *conn      = action->args.connection.conn;
     qdr_link_t       *link      = action->args.connection.link;
