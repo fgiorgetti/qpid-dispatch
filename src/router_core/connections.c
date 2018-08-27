@@ -1803,6 +1803,7 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
     // Bump the detach count to track half and full detaches
     //
     link->detach_count++;
+    qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - entered qdr_link_inbound_detach_CT");
 
     //
     // For routed links, propagate the detach
