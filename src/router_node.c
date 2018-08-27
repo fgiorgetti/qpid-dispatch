@@ -775,7 +775,7 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
     pn_link_t      *pn_link      = qd_link_pn(link);
 
     if (!pn_link) {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%\"PRIu64\"] ENTMQIC-2033 - AMQP_link_detach_handler - !pn_link", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - !pn_link", qd_link_connection(link));
         return 0;
     }
 
@@ -795,7 +795,7 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
     pn_condition_t *cond   = qd_link_pn(link) ? pn_link_remote_condition(qd_link_pn(link)) : 0;
 
     if (rlink) {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%\"PRIu64\"] ENTMQIC-2033 - AMQP_link_detach_handler - rlink", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - rlink", qd_link_connection(link));
 
         //
         // This is the last event for this link that we will send into the core.  Remove the
@@ -817,7 +817,7 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
         qdr_error_t *error = qdr_error_from_pn(cond);
         qdr_link_detach(rlink, dt, error);
     } else {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%\"PRIu64\"] ENTMQIC-2033 - AMQP_link_detach_handler - !rlink", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - !rlink", qd_link_connection(link));
     }
 
     return 0;
@@ -1375,10 +1375,10 @@ static void CORE_link_detach(void *context, qdr_link_t *link, qdr_error_t *error
     }
 
     if (close) {
-        qd_log(qd_message_log_source(), QD_LOG_INFO, "ENTMQIC-2033 - if close");
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - if close", qd_link_connection(qlink));
         qd_link_close(qlink);
     } else {
-        qd_log(qd_message_log_source(), QD_LOG_INFO, "ENTMQIC-2033 - if !close");
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - if !close", qd_link_connection(qlink));
         qd_link_detach(qlink);
     }
 
