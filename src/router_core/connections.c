@@ -296,6 +296,7 @@ int qdr_connection_process(qdr_connection_t *conn)
                 switch (link_work->work_type) {
                 case QDR_LINK_WORK_DELIVERY :
                     {
+                        qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - qdr_connection_process - QDR_LINK_WORK_DELIVERY", tport);
                         int count = core->push_handler(core->user_context, link, link_work->value);
                         assert(count <= link_work->value);
                         link_work->value -= count;
@@ -303,6 +304,7 @@ int qdr_connection_process(qdr_connection_t *conn)
                     }
 
                 case QDR_LINK_WORK_FLOW :
+                    qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - qdr_connection_process - QDR_LINK_WORK_FLOW", tport);
                     if (link_work->value > 0)
                         core->flow_handler(core->user_context, link, link_work->value);
                     if      (link_work->drain_action == QDR_LINK_WORK_DRAIN_ACTION_SET)
@@ -314,10 +316,12 @@ int qdr_connection_process(qdr_connection_t *conn)
                     break;
 
                 case QDR_LINK_WORK_FIRST_DETACH :
+                    qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - qdr_connection_process - QDR_LINK_WORK_FIRST_DETACH", tport);
                     core->detach_handler(core->user_context, link, link_work->error, true, link_work->close_link);
                     break;
 
                 case QDR_LINK_WORK_SECOND_DETACH :
+                    qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - qdr_connection_process - QDR_LINK_WORK_SECOND_DETACH", tport);
                     core->detach_handler(core->user_context, link, link_work->error, false, link_work->close_link);
                     free_link = true;
                     break;
@@ -325,10 +329,12 @@ int qdr_connection_process(qdr_connection_t *conn)
 
                 sys_mutex_lock(conn->work_lock);
                 if (link_work->work_type == QDR_LINK_WORK_DELIVERY && link_work->value > 0) {
+                    qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - qdr_connection_process - if QDR_LINK_WORK_DELIVERY", tport);
                     DEQ_INSERT_HEAD(link->work_list, link_work);
                     link_work->processing = false;
                     link_work = 0; // Halt work processing
                 } else {
+                    qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - qdr_connection_process - else QDR_LINK_WORK_DELIVERY [link_work=%p]", tport, link_work);
                     qdr_error_free(link_work->error);
                     free_qdr_link_work_t(link_work);
                     link_work = DEQ_HEAD(link->work_list);
