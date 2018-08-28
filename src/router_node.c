@@ -1356,12 +1356,16 @@ static void CORE_link_detach(void *context, qdr_link_t *link, qdr_error_t *error
     qd_connection_t *conn = qd_link_connection(qlink);
     pn_transport_t *tport = pn_connection_transport(conn->pn_conn);
 
-    if (!qlink)
+    if (!qlink) {
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%p] ENTMQIC-2033 - CORE_link_detach - !qlink", tport);
         return;
+    }
 
     pn_link_t *pn_link = qd_link_pn(qlink);
-    if (!pn_link)
+    if (!pn_link) {
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%p] ENTMQIC-2033 - CORE_link_detach - !pn_link", tport);
         return;
+    }
 
     if (error) {
         pn_condition_t *cond = pn_link_condition(pn_link);
