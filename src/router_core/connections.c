@@ -1963,7 +1963,6 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
         qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", tport, dt, QD_LOST);
         if (dt != QD_LOST) {
             qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - dt is != QD_LOST", tport);
-            conn->in_activate_list = false;
             qdr_link_outbound_detach_CT(core, link, 0, QDR_CONDITION_NONE, dt == QD_CLOSED);
         }
     } else {
