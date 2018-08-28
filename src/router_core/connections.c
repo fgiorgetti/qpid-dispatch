@@ -554,11 +554,11 @@ void qdr_connection_activate_CT(qdr_core_t *core, qdr_connection_t *conn)
     }
     qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT", tport);
 
-    if (!conn->in_activate_list) {
+//    if (!conn->in_activate_list) {
         qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT - !in_activate_list", tport);
         DEQ_INSERT_TAIL_N(ACTIVATE, core->connections_to_activate, conn);
         conn->in_activate_list = true;
-    }
+//    }
 }
 
 
