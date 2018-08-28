@@ -30,6 +30,7 @@
 #include <qpid/dispatch/proton_utils.h>
 #include <proton/sasl.h>
 #include <inttypes.h>
+#include <router_core/router_core_private.h>
 
 const char *QD_ROUTER_NODE_TYPE = "router.node";
 const char *QD_ROUTER_ADDRESS_TYPE = "router.address";
@@ -767,15 +768,18 @@ static int AMQP_link_flow_handler(void* context, qd_link_t *link)
  */
 static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_type_t dt)
 {
+    qd_connection_t *conn = qd_link_connection(link);
+    pn_transport_t *tport = pn_connection_transport(conn->pn_conn);
+
     if (!link) {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - !link", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - AMQP_link_detach_handler - !link", tport);
         return 0;
     }
 
     pn_link_t      *pn_link      = qd_link_pn(link);
 
     if (!pn_link) {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - !pn_link", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - AMQP_link_detach_handler - !pn_link", tport);
         return 0;
     }
 
@@ -795,7 +799,7 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
     pn_condition_t *cond   = qd_link_pn(link) ? pn_link_remote_condition(qd_link_pn(link)) : 0;
 
     if (rlink) {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - rlink", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - AMQP_link_detach_handler - rlink", tport);
 
         //
         // This is the last event for this link that we will send into the core.  Remove the
@@ -817,7 +821,7 @@ static int AMQP_link_detach_handler(void* context, qd_link_t *link, qd_detach_ty
         qdr_error_t *error = qdr_error_from_pn(cond);
         qdr_link_detach(rlink, dt, error);
     } else {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - AMQP_link_detach_handler - !rlink", qd_link_connection(link));
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - AMQP_link_detach_handler - !rlink", tport);
     }
 
     return 0;
@@ -1348,6 +1352,10 @@ static void CORE_link_detach(void *context, qdr_link_t *link, qdr_error_t *error
 {
     qd_router_t *router = (qd_router_t*) context;
     qd_link_t   *qlink  = (qd_link_t*) qdr_link_get_context(link);
+
+    qd_connection_t *conn = qd_link_connection(qlink);
+    pn_transport_t *tport = pn_connection_transport(conn->pn_conn);
+
     if (!qlink)
         return;
 
@@ -1375,10 +1383,10 @@ static void CORE_link_detach(void *context, qdr_link_t *link, qdr_error_t *error
     }
 
     if (close) {
-        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - if close", qd_link_connection(qlink));
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%p] ENTMQIC-2033 - if close", tport);
         qd_link_close(qlink);
     } else {
-        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%"PRIu64"] ENTMQIC-2033 - if !close", qd_link_connection(qlink));
+        qd_log(qd_message_log_source(), QD_LOG_INFO, "[%p] ENTMQIC-2033 - if !close", tport);
         qd_link_detach(qlink);
     }
 
