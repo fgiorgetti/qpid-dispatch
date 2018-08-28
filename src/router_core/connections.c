@@ -547,7 +547,15 @@ void qdr_connection_handlers(qdr_core_t                *core,
 
 void qdr_connection_activate_CT(qdr_core_t *core, qdr_connection_t *conn)
 {
+    qd_connection_t *qconn = (qd_connection_t *) qdr_connection_get_context(conn);
+    pn_transport_t *tport = NULL;
+    if (qconn) {
+        tport = pn_connection_transport(qconn->pn_conn);
+    }
+    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT", tport);
+
     if (!conn->in_activate_list) {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT - !in_activate_list", tport);
         DEQ_INSERT_TAIL_N(ACTIVATE, core->connections_to_activate, conn);
         conn->in_activate_list = true;
     }
@@ -572,6 +580,14 @@ void qdr_link_enqueue_work_CT(qdr_core_t      *core,
                               qdr_link_t      *link,
                               qdr_link_work_t *work)
 {
+    qd_link_t *qlink = (qd_link_t*) qdr_link_get_context(link);
+    qd_connection_t *qconn = qd_link_connection(qlink);
+    pn_transport_t *tport = NULL;
+    if (qconn) {
+        tport = pn_connection_transport(qconn->pn_conn);
+    }
+    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_enqueue_work_CT", tport);
+
     qdr_connection_t *conn = link->conn;
 
     sys_mutex_lock(conn->work_lock);
@@ -919,41 +935,59 @@ qdr_link_t *qdr_create_link_CT(qdr_core_t       *core,
 
 void qdr_link_outbound_detach_CT(qdr_core_t *core, qdr_link_t *link, qdr_error_t *error, qdr_condition_t condition, bool close)
 {
+    qd_link_t *qlink = (qd_link_t*) qdr_link_get_context(link);
+    qd_connection_t *qconn = qd_link_connection(qlink);
+    pn_transport_t *tport = NULL;
+    if (qconn) {
+        tport = pn_connection_transport(qconn->pn_conn);
+    }
+
+    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT", tport);
+
     qdr_link_work_t *work = new_qdr_link_work_t();
     ZERO(work);
     work->work_type  = ++link->detach_count == 1 ? QDR_LINK_WORK_FIRST_DETACH : QDR_LINK_WORK_SECOND_DETACH;
     work->close_link = close;
 
-    if (error)
+    if (error) {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - ERROR", tport);
         work->error = error;
-    else {
+    } else {
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - NO ERROR", tport);
         switch (condition) {
         case QDR_CONDITION_NO_ROUTE_TO_DESTINATION:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - No route to the destination node", tport);
             work->error = qdr_error("qd:no-route-to-dest", "No route to the destination node");
             break;
 
         case QDR_CONDITION_ROUTED_LINK_LOST:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - Connectivity to the peer container was lost", tport);
             work->error = qdr_error("qd:routed-link-lost", "Connectivity to the peer container was lost");
             break;
 
         case QDR_CONDITION_FORBIDDEN:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - Connectivity to the node is forbidden", tport);
             work->error = qdr_error("qd:forbidden", "Connectivity to the node is forbidden");
             break;
 
         case QDR_CONDITION_WRONG_ROLE:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - Link attach forbidden on inter-router connection", tport);
             work->error = qdr_error("qd:connection-role", "Link attach forbidden on inter-router connection");
             break;
 
         case QDR_CONDITION_COORDINATOR_PRECONDITION_FAILED:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - The router can't coordinate transactions by itself", tport);
             work->error = qdr_error(QD_AMQP_COND_PRECONDITION_FAILED, "The router can't coordinate transactions by itself, a "
                                                             "linkRoute to a coordinator must be configured to use transactions.");
             break;
 
         case QDR_CONDITION_INVALID_LINK_EXPIRATION:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - Requested link expiration not allowed", tport);
             work->error = qdr_error("qd:link-expiration", "Requested link expiration not allowed");
             break;
 
         case QDR_CONDITION_NONE:
+            qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - None", tport);
             work->error = 0;
             break;
         }
