@@ -263,6 +263,17 @@ int qdr_connection_process(qdr_connection_t *conn)
 
         if (link) {
 
+            /*
+            // FERNANDO
+            qd_link_t *qlink = (qd_link_t*) qdr_link_get_context(link);
+            qd_connection_t *qconn = qd_link_connection(qlink);
+            pn_transport_t *tport = NULL;
+            if (qconn) {
+                tport = pn_connection_transport(qconn->pn_conn);
+            }
+            qd_log(core->log, QD_LOG_INFO, "ENTMQIC2033 - qdr_connection_process - if(link)");
+            */
+
             //
             // Handle disposition/settlement updates
             //
