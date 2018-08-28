@@ -554,11 +554,11 @@ void qdr_connection_activate_CT(qdr_core_t *core, qdr_connection_t *conn)
     }
     qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT", tport);
 
-//    if (!conn->in_activate_list) {
+    if (!conn->in_activate_list) {
         qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT - !in_activate_list", tport);
         DEQ_INSERT_TAIL_N(ACTIVATE, core->connections_to_activate, conn);
         conn->in_activate_list = true;
-//    }
+    }
 }
 
 
@@ -1961,9 +1961,10 @@ static void qdr_link_inbound_detach_CT(qdr_core_t *core, qdr_action_t *action, b
         // If the detach occurred via protocol, send a detach back.
         //
         qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", tport, dt, QD_LOST);
-        if (dt != QD_LOST)
+        if (dt != QD_LOST) {
             qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - dt is != QD_LOST", tport);
             qdr_link_outbound_detach_CT(core, link, 0, QDR_CONDITION_NONE, dt == QD_CLOSED);
+        }
     } else {
         qd_log(core->log, QD_LOG_INFO, "[%p] ENTMQIC2033 - dt = %d [ QD_LOST = %d ]", tport, dt, QD_LOST);
         qdr_link_cleanup_CT(core, conn, link);
