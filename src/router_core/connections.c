@@ -518,7 +518,8 @@ void qdr_link_detach(qdr_link_t *link, qd_detach_type_t dt, qdr_error_t *error)
     qd_connection_t *conn = qd_link_connection(qlink);
     pn_transport_t *tport = pn_connection_transport(conn->pn_conn);
 
-    qd_log(link->core->log, QD_LOG_INFO, "[%p] ENTMQIC-2033 - link_detach enqueued", tport);
+    qd_log(link->core->log, QD_LOG_INFO, "[%p] ENTMQIC-2033 - link_detach enqueued - dt = %d", tport, dt);
+
 }
 
 
