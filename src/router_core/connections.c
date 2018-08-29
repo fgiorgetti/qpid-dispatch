@@ -1392,6 +1392,16 @@ static void qdr_connection_closed_CT(qdr_core_t *core, qdr_action_t *action, boo
     while (link_ref) {
         qdr_link_t *link = link_ref->link;
 
+        // FERNANDO
+        qd_link_t   *qlink  = (qd_link_t*) qdr_link_get_context(link);
+        if (qlink) {
+            qd_connection_t *qconn = qd_link_connection(qlink);
+            if (qconn) {
+                pn_transport_t *tport = pn_connection_transport(qconn->pn_conn);
+                qd_log(qd_message_log_source(), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_closed_CT", tport);
+            }
+        }
+
         //
         // Clean up the link and all its associated state.
         //
