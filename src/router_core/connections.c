@@ -605,7 +605,7 @@ void qdr_link_enqueue_work_CT(qdr_core_t      *core,
     if (qconn) {
         tport = pn_connection_transport(qconn->pn_conn);
     }
-    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_enqueue_work_CT", tport);
+    qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_enqueue_work_CT - work_list size = %d", tport, DEQ_SIZE(link->work_list));
 
     qdr_connection_t *conn = link->conn;
 
@@ -972,7 +972,7 @@ void qdr_link_outbound_detach_CT(qdr_core_t *core, qdr_link_t *link, qdr_error_t
         qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - ERROR", tport);
         work->error = error;
     } else {
-        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - NO ERROR", tport);
+        qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - NO ERROR - work_type = %d", tport, work->work_type);
         switch (condition) {
         case QDR_CONDITION_NO_ROUTE_TO_DESTINATION:
             qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_link_outbound_detach_CT - No route to the destination node", tport);
