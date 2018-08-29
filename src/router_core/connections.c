@@ -573,14 +573,11 @@ void qdr_connection_activate_CT(qdr_core_t *core, qdr_connection_t *conn)
     }
     qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT", tport);
 
-    //FERNANDO
-    sys_mutex_lock(conn->work_lock);
     if (!conn->in_activate_list) {
         qd_log(qd_log_source("ROUTER"), QD_LOG_INFO, "[%p] ENTMQIC-2033 - qdr_connection_activate_CT - !in_activate_list", tport);
         DEQ_INSERT_TAIL_N(ACTIVATE, core->connections_to_activate, conn);
         conn->in_activate_list = true;
     }
-    sys_mutex_unlock(conn->work_lock);
 }
 
 
@@ -1428,13 +1425,10 @@ static void qdr_connection_closed_CT(qdr_core_t *core, qdr_action_t *action, boo
     //
     // If this connection is on the activation list, remove it from the list
     //
-    //FERNANDO
-    sys_mutex_lock(conn->work_lock);
     if (conn->in_activate_list) {
         conn->in_activate_list = false;
         DEQ_REMOVE_N(ACTIVATE, core->connections_to_activate, conn);
     }
-    sys_mutex_unlock(conn->work_lock);
 
     DEQ_REMOVE(core->open_connections, conn);
     qdr_connection_free(conn);
