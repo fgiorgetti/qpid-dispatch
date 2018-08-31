@@ -610,7 +610,11 @@ void qdr_link_enqueue_work_CT(qdr_core_t      *core,
     qdr_connection_t *conn = link->conn;
 
     sys_mutex_lock(conn->work_lock);
-    DEQ_INSERT_TAIL(link->work_list, work);
+    if ( work->work_type == QDR_LINK_WORK_SECOND_DETACH ) {
+        DEQ_INSERT_HEAD(link->work_list, work);
+    } else {
+        DEQ_INSERT_TAIL(link->work_list, work);
+    }
     qdr_add_link_ref(&conn->links_with_work, link, QDR_LINK_LIST_CLASS_WORK);
     sys_mutex_unlock(conn->work_lock);
 
