@@ -856,6 +856,7 @@ static void qdr_link_forward_CT(qdr_core_t *core, qdr_link_t *link, qdr_delivery
             if (dlv->link->link_type == QD_LINK_ENDPOINT)
                 core->dropped_presettled_deliveries++;
         } else {
+            qd_log(core->log, QD_LOG_INFO, "Releasing unsettled delivery in qdr_addr_path_count_CT");
             qdr_delivery_release_CT(core, dlv);
 
             //
@@ -912,8 +913,10 @@ static void qdr_link_forward_CT(qdr_core_t *core, qdr_link_t *link, qdr_delivery
         //
         // If the delivery is not settled, release it.
         //
-        if (!dlv->settled)
+        if (!dlv->settled) {
+            qd_log(core->log, QD_LOG_INFO, "Releasing unsettled delivery in fanout == 0");
             qdr_delivery_release_CT(core, dlv);
+        }
 
         //
         // Decrementing the delivery ref count for the action
@@ -1046,6 +1049,7 @@ static void qdr_link_deliver_CT(qdr_core_t *core, qdr_action_t *action, bool dis
         // Deal with any delivery restrictions for this address.
         //
         if (addr && addr->router_control_only && link->link_type != QD_LINK_CONTROL) {
+            qd_log(core->log, QD_LOG_INFO, "Releasing unsettled delivery in qdr_link_deliver_CT");
             qdr_delivery_release_CT(core, dlv);
             qdr_link_issue_credit_CT(core, link, 1, false);
             qdr_delivery_decref_CT(core, dlv, "qdr_link_deliver_CT - removed from action on restricted access");
