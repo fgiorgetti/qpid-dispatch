@@ -742,6 +742,7 @@ static void qdr_unsubscribe_CT(qdr_core_t *core, qdr_action_t *action, bool disc
     qdr_subscription_t *sub = action->args.io.subscription;
 
     if (!discard) {
+        qd_log(core->log, QD_LOG_INFO, "qdr_unsubscribe_CT action -> %s", action->label);
         DEQ_REMOVE(sub->addr->subscriptions, sub);
         sub->addr = 0;
         qdr_check_addr_CT(sub->core, sub->addr);
