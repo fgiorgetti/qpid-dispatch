@@ -827,7 +827,9 @@ static void qdr_link_flow_CT(qdr_core_t *core, qdr_action_t *action, bool discar
 static long qdr_addr_path_count_CT(qdr_address_t *addr)
 {
     printf("addr->subscriptions: %ld\n", (long) DEQ_SIZE(addr->subscriptions));
+    printf("addr->rlinks empty?: %d\n", DEQ_IS_EMPTY(addr->rlinks));
     printf("addr->rlinks: %ld\n", (long) DEQ_SIZE(addr->rlinks));
+    printf("addr->rnodes: %d\n", NULL != addr->rnodes);
     printf("addr->rnodes: %ld\n", (long) qd_bitmask_cardinality(addr->rnodes));
     long rc = ((long) DEQ_SIZE(addr->subscriptions)
                + (long) DEQ_SIZE(addr->rlinks)
