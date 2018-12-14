@@ -832,12 +832,13 @@ static long qdr_addr_path_count_CT(qdr_address_t *addr)
     long rc = ((long) DEQ_SIZE(addr->subscriptions)
                + (long) DEQ_SIZE(addr->rlinks)
                + (long) qd_bitmask_cardinality(addr->rnodes));
-    if (addr->exchange)
+    if (addr->exchange) {
         printf("binding_count addr->exchange: %ld\n", (long) qdr_exchange_binding_count(addr->exchange));
         printf("alternate_addr addr->exchange: %d\n", ((qdr_exchange_alternate_addr(addr->exchange)) ? 1 : 0));
 
         rc += qdr_exchange_binding_count(addr->exchange)
             + ((qdr_exchange_alternate_addr(addr->exchange)) ? 1 : 0);
+    }
     return rc;
 }
 
