@@ -824,12 +824,14 @@ static void create_settings_frame(qdr_http2_connection_t *conn)
 }
 
 
+/*
 static void send_ping_frame(qdr_http2_connection_t *conn)
 {
     qdr_http2_session_data_t *session_data = conn->session_data;
     nghttp2_submit_ping(session_data->session, NGHTTP2_FLAG_NONE, 0);
     nghttp2_session_send(session_data->session);
 }
+*/
 
 static void check_send_ping_frame(qdr_http2_connection_t *conn)
 {
@@ -840,7 +842,7 @@ static void check_send_ping_frame(qdr_http2_connection_t *conn)
     // Send a ping frame every 4 seconds.
     //
     if (!conn->ingress && conn->woken_by_ping && (current - prev >= 4)) {
-        send_ping_frame(conn);
+//        send_ping_frame(conn);
         qd_log(http2_adaptor->log_source, QD_LOG_TRACE, "[C%"PRIu64"] Sent PING frame", conn->conn_id);
         qd_timer_schedule(conn->ping_timer, 4000);
         conn->prev_ping = current;
